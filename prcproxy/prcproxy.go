@@ -74,7 +74,7 @@ func parseTime(t string) (time.Time, error) {
 	stringToParse := t + ":00"
 	pt, err := time.Parse("15:04:05", stringToParse)
 	if err != nil {
-		return time.Now(), nil
+		return time.Time{}, err
 	}
 	return pt, nil
 }
