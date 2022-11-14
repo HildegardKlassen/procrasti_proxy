@@ -37,19 +37,26 @@ func Run() error {
 	blockAll := flag.Bool("blockall", false, "Set to block all requests always.")
 	blockList := flag.String("blocksites", "", "Sites to block seperated by comma. Exampe: --blocksites google.com,github.com")
 	port := flag.String("port", "1994", "Port to listen on. Example: --port 1994")
-	startBlockTime := flag.String("startblocktime", "09:00", "Time the blocking requests window is aktive. Example: --startblocktime 09:00")
-	endBlockTime := flag.String("endblocktime", "17:00", "Time the blocking requests window is aktive. Example: --endblocktime 17:00")
+	startBlockTimeVal := flag.String("startblocktime", "09:00", "Time the blocking requests window is aktive. Example: --startblocktime 09:00")
+	endBlockTimeVal := flag.String("endblocktime", "17:00", "Time the blocking requests window is aktive. Example: --endblocktime 17:00")
 
 	list, err := parseBlockList(*blockList)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	st, err := parseTime(*startBlockTime)
+	if *startBlockTimeVal != "" {
+		startBlockTime = *startBlockTimeVal
+	}
+	if *endBlockTimeVal != "" {
+		endBlockTime = *endBlockTimeVal
+	}
+
+	st, err := parseTime(startBlockTime)
 	if err != nil {
 		return err
 	}
-	et, err := parseTime(*endBlockTime)
+	et, err := parseTime(endBlockTime)
 	if err != nil {
 		return err
 	}
