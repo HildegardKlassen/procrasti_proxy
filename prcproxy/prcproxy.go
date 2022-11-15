@@ -18,7 +18,6 @@ type PrcProxy struct {
 	Port             string
 	BlockAllRequests bool
 	BlockList        []string
-	OfficeTimeSlot   time.Duration
 	BlockStartTime   time.Time
 	BlockEndTime     time.Time
 }
@@ -40,9 +39,11 @@ func Run() error {
 	startBlockTimeVal := flag.String("startblocktime", "09:00", "Time the blocking requests window is aktive. Example: --startblocktime 09:00")
 	endBlockTimeVal := flag.String("endblocktime", "17:00", "Time the blocking requests window is aktive. Example: --endblocktime 17:00")
 
+	flag.Parse()
+
 	list, err := parseBlockList(*blockList)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	if *startBlockTimeVal != "" {
@@ -63,6 +64,9 @@ func Run() error {
 
 	proxy := NewPrcProxy(*port, *blockAll, list, st, et)
 	router := proxy.CreateRouter()
+
+	fmt.Printf("The proxy runs on port %s...", *port)
+	fmt.Printf("Following sites will be blocked: %s", proxy.BlockList)
 
 	log.Fatal(http.ListenAndServe(fmt.Sprintf("localhost:%s", proxy.Port), router))
 	return nil

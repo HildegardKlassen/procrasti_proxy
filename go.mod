@@ -1,4 +1,4 @@
-module procrasti_proxy
+module github.com/HildegardKlassen/procrasti_proxy
 
 go 1.18
 

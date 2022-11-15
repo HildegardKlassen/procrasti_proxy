@@ -58,7 +58,7 @@ func TestAllowEverything(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 
-			p := NewPrcProxy("1994", false, []string{}, time.Now(), time.Now())
+			p := NewPrcProxy("1994", false, []string{}, time.Time{}, time.Time{})
 
 			host := "google.com"
 			url := fmt.Sprintf("http://%s", host)
@@ -103,7 +103,7 @@ func TestIsHostInBlockList(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 
-			p := NewPrcProxy("1994", false, []string{}, time.Now(), time.Now())
+			p := NewPrcProxy("1994", false, []string{}, time.Time{}, time.Time{})
 			p.BlockList = append(p.BlockList, "google.com")
 			isInList := p.isHostInBlockList(tc.host)
 
@@ -142,7 +142,7 @@ func TestRemoveHostFromBlockList(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 
-			p := NewPrcProxy("1994", false, []string{}, time.Now(), time.Now())
+			p := NewPrcProxy("1994", false, []string{}, time.Time{}, time.Time{})
 			p.BlockList = append(p.BlockList, "google.com", "hildegard.de")
 			p.removeHostFromBlockList(tc.hostToRemove)
 			isInList := p.isHostInBlockList(tc.hostToRemove)
@@ -152,3 +152,71 @@ func TestRemoveHostFromBlockList(t *testing.T) {
 		})
 	}
 }
+
+func TestTimeIsInWindow(t *testing.T) {
+	type TestCase struct {
+		name         string
+		suppliedTime string
+		wanted       bool
+	}
+
+	testCases := []TestCase{
+		{
+			name:         "time in window",
+			suppliedTime: "10:00",
+			wanted:       true,
+		},
+		{
+			name:         "time not in window",
+			suppliedTime: "08:00",
+			wanted:       false,
+		},
+		{
+			name:         "time is invalid",
+			suppliedTime: "700",
+			wanted:       false,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+
+			p := NewPrcProxy("1994", false, []string{}, time.Date(int(0000), time.January, int(1), int(9), int(0), int(0), int(0), time.Now().Local().Location()), time.Date(int(0000), time.January, int(1), int(17), int(0), int(0), int(0), time.Now().Local().Location()))
+			ot, _ := parseTime(tc.suppliedTime)
+
+			tiw := p.timeIsInWindow(ot)
+			if tiw != tc.wanted {
+				t.Fatalf("%s failed: wanted: %v, got: %v", tc.name, tc.wanted, tiw)
+			}
+		})
+	}
+}
+
+// func TestAdminHostConfigurationHandler(t *testing.T) {
+// 	type TestCase struct {
+// 		name       string
+// 		request    *http.Request
+// 		wantedCode int
+// 	}
+
+// 	testCases := []TestCase{
+// 		{
+// 			name:       "time in window",
+// 			request:    httptest.NewRequest("GET", "http://admin/block/google.com", strings.NewReader("")),
+// 			wantedCode: 200,
+// 		},
+// 	}
+
+// 	for _, tc := range testCases {
+// 		t.Run(tc.name, func(t *testing.T) {
+
+// 			p := NewPrcProxy("1994", false, []string{}, time.Time{})
+// 			ot, _ := parseTime(tc.suppliedTime)
+
+// 			tiw := p.timeIsInWindow(ot)
+// 			if tiw != tc.wanted {
+// 				t.Fatalf("%s failed: wanted: %v, got: %v", tc.name, tc.wanted, tiw)
+// 			}
+// 		})
+// 	}
+// }

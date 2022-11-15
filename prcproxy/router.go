@@ -23,10 +23,12 @@ func (p *PrcProxy) CreateRouter() *mux.Router {
 }
 
 func (p *PrcProxy) blockAllHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Printf("the request with URL %s is blocked", r.URL.Path)
 	http.Error(w, "FORBIDDEN", http.StatusForbidden)
 }
 
 func (p *PrcProxy) routeAllRequestsHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Printf("the request with Host %s is routed", r.Host)
 	res, err := http.Get(r.URL.String())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -39,8 +41,11 @@ func (p *PrcProxy) routeAllRequestsHandler(w http.ResponseWriter, r *http.Reques
 }
 func (p *PrcProxy) blockRequestsFromList(w http.ResponseWriter, r *http.Request) {
 	if p.timeIsInWindow(time.Now()) {
+		fmt.Printf("Yes time is in window.")
 		if p.isHostInBlockList(r.URL.Host) {
+			fmt.Printf("Yes host is in blocklist.")
 			p.blockAllHandler(w, r)
+			return
 		}
 	}
 
