@@ -3,7 +3,8 @@ package main
 import (
 	"fmt"
 	"log"
-	"procrasti_proxy/prcproxy"
+
+	"github.com/HildegardKlassen/procrasti_proxy/prcproxy"
 )
 
 func main() {
